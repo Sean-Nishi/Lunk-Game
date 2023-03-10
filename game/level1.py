@@ -1,4 +1,5 @@
 import pygame
+import csv
 from settings import TILESIZE, LOOP_MUSIC
 from wall import Wall
 from plant import Plant
@@ -28,7 +29,10 @@ class Level:
 
         # default world map
         # KEY: x = wall, p = player
-        self.world_map = []
+        with open('levels/testing_level/testing-map_landscape.csv', newline='') as csvfile: 
+            data = list(csv.reader(csvfile))
+
+        self.world_map = data
         # map size in number of 64 pixels = (20x, 20y size)
         self.map_size = pygame.math.Vector2(20, 20)
 
@@ -64,7 +68,7 @@ class Level:
                         [self.visible_sprites, self.friendly_spriites],
                         self.obstacle_sprites,
                     )
-        sizeOfLandBlock = 64
+        sizeOfLandBlock = 16
 
         # pass in map size so player can do wrap around if needed
         self.player = Player(
