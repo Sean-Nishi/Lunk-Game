@@ -3,12 +3,17 @@
 
 ## Table of contents
 - [Objective](#objective)
+- [Game Flow](#game-flow)
 - [Player Movement](#player-movement)
     - [Wall Collisions](#wall-collisions)
     - [Player Rotation](#player-rotation)
       - [Movement Rotation](#movement-rotation)
       - [Animation Rotation](#animation-rotation)
       - [Player Status](#player-status)
+- [Map](#map)
+    - [Landscape Map](#landscape-map)
+    - [Entity Map](#entity-map)
+    - [Entity Detection](#entity-detection)
 - [Enemy Movement](#enemy-movement)
 - [Enemy Interaction](#enemy-interaction)
     - [Attack Enemy Options](#attack-enemy-options)
@@ -19,6 +24,7 @@
     - [High Score](#high-score)
     - [Boredom Meter](#boredom-meter)
 - [Map Rendering System](#map-rendering-system)
+- [Tile Set Support](#tile-set-support)
 
 
 ## Objective
@@ -35,6 +41,16 @@ Lunk negative interactions:
 * crush damsel
 * ingest non-tasty things
 
+## Game Flow
+The game will start with Lunk spawning into a level facing towards the center of the map. Lunk will be always be running.
+
+There will be a set amount of enemies on the map.
+There will be a set amount of damsels in distress on the map.
+The map will have landscape entities that act as barriers.
+
+The player will be incentivized to plan an optimal route to save the maximum amount of damsels. Levels should be structured such that deviating from the optimal route should have negative consequences, but not be unfun to play.
+
+A cut scene of the camera panning accross the map should be shown at the start of each level for players to plan their approach.
 
 ## Player Movement
 Lunk always goes forward, but he can choose to turn to the left or the right.
@@ -93,6 +109,23 @@ The player status is determined by the current player rotation. The options are 
 
 The player status determines which animation frame will be active.
 
+## Map
+There are multiple map files stored per level. a map file is a CSV file containing the location of a tilesheet asset. Each layer of objects within the map will have it's own CSV file.
+The 2 essential maps are the landscape map and the entity map, but there will be additional maps stored that contain item locations such as rocks, trees, shrubs, and sign posts ect.
+
+### Landscape Map
+The map will be stored as CSV files containing integers associated with a landscape on the tileset.
+A internal mapping of values to tileset locations will be stored for simple tileset lookup based on the CSV file.
+
+### Entity Map
+The entity map will be the same size as the landscape map, but hold and array of objects instead of primitives. Each object will contain all the entities within that map location.
+If nothing can be interacted with, the map location will be set an empty array. This map will not exist as a file, and instead will be managed in memory.
+
+### Entity Detection
+Any entities that can interact with each other will be listed on the entity map. Collisions and other interactions such as movement towards entities under specific conditions will be done by checking against the entity map.
+
+Entities will know where they are on the entity map by storing their own location indivdually. Both the individual location and the entity map location should be updated on movement.
+
 ## Enemy Movement
 Enemies will wander the map after being spawned.
 
@@ -146,4 +179,11 @@ Each level has a set timer that ticks up to the moment Lunk goes to sleep from b
 ## Map Rendering System
 The map shall not be rerendered unless the player object is within x% of the screen width.
 
-If the player has crossed the rerendering border, the map and player will rerender repeatedly moving the player position slowly back to the center of the view port until the player is centered in the screen. 
+If the player has crossed the rerendering border, the map and player will rerender repeatedly moving the player position slowly back to the center of the view port until the player is centered in the screen.
+
+## Tile Set Support
+There will be support for reading images in from a tileset or spritesheet of images. 
+A tileset is defined as a single image storing many subimages in a grid. This grid of images can be parsed for internal use by knowing the coordinates of specific images within the tileset grid.
+
+Tilesets are used to create landscape maps in an external programed called tiled. These tiled maps are exported as an CSV of integer values that map to a subimage within the tileset.
+Internal mapping that matches tiled mapping is stored for seemless integration between generated maps and pygame.
